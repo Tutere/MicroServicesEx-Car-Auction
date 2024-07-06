@@ -10,6 +10,7 @@ builder.Services.AddDbContext<AuctionDBContext>(opt =>
 {
     opt.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies()); //will look for any classes that derive from profile class and register the mappings in memory so that when itncomes to using autoMapper, it's already setup and ready to go
 
 var app = builder.Build();
 
@@ -18,5 +19,15 @@ var app = builder.Build();
 app.UseAuthorization();
 
 app.MapControllers();
+
+try
+{
+    DbInitializer.InitDb(app);
+}
+catch (Exception e)
+{
+
+    Console.WriteLine(e);
+}
 
 app.Run();
