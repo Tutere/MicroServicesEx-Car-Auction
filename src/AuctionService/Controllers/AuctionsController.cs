@@ -1,12 +1,13 @@
 ﻿using AuctionService.Data;
 using AuctionService.DTOs;
+using AuctionService.Entities;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AuctionService.Controllers;
 
-[ApiController]
+[ApiController] //responsible for checking validation and requirements
 [Route("api/auctions")]
 public class AuctionsController : ControllerBase
 {
@@ -41,5 +42,22 @@ public class AuctionsController : ControllerBase
 
         return _mapper.Map<AuctionDto>(auction);
 
+    }
+
+    [HttpPost]
+    public async Task<ActionResult<AuctionDto>> CreateAuction(CreateAuctionDto auctionDto)
+    {
+        var auction = _mapper.Map<Auction>(auctionDto); //<> specifies what we want to map into (from an auctionDto)
+        //TODO: add current user as seller
+        auction.Seller = "test";
+
+        _context.Auctions.Add(auction); //simply just adding to memory at this point, hasn't actually been added to the db
+
+        var result = await _context.SaveChangesAsync() > 0;
+
+        if (!result) return BadRequest("Could not save changes to the DB");
+
+        return CreatedAtAction(nameof(GetAuctionById),
+            new { auction.Id }, _mapper.Map<AuctionDto>(auction));
     }
 }
