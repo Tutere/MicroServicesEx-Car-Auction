@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Contracts;
 
 namespace SearchService;
 
@@ -6,6 +7,6 @@ public class MappingProfiles : Profile
 {
     public MappingProfiles()
     {
-        CreateMap<AuctionCreatedConsumer, Item>();
+        CreateMap<AuctionCreated, Item>();
     }
 }
